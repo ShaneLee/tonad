@@ -1,0 +1,36 @@
+{
+  "name": "tonad",
+  "version": "1.0.0",
+  "description": "A TypeScript monad library",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ShaneLee/tonad.git"
+  },
+  "keywords": [
+    "TypeScript",
+    "Monad",
+    "Functional",
+    "Programming",
+    "Functor"
+  ],
+  "author": "Shane Lee",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ShaneLee/tonad/issues"
+  },
+  "homepage": "https://github.com/ShaneLee/tonad#readme",
+  "devDependencies": {
+    "@types/jest": "^26.0.15",
+    "jest": "^26.6.3"
+  },
+  "dependencies": {
+    "@babel/preset-env": "^7.12.11",
+    "@babel/preset-typescript": "^7.12.7"
+  }
+}
