@@ -1,5 +1,3 @@
-import { Monad } from '../src/monad'
-import { Maybe } from '../src/maybe'
 import { maybe } from '../src/maybe.factory'
 
 describe('maybe', () => {
@@ -50,7 +48,7 @@ describe('maybe', () => {
   describe('get or default', () => {
     it('gets value when value present', () => {
       const test: string = 'Hello'
-      expect(maybe(test).getOrDefault()).toBe(test)
+      expect(maybe(test).getOrDefault('')).toBe(test)
     })  
 
     it('gets from default value when no value present', () => {
@@ -75,14 +73,18 @@ describe('maybe', () => {
     it('returns retains value when filter predicate false', () => {
       const test: string = 'Hello'
       expect(maybe(test)
-              .filter(val => val === test)
+              .filter(val => val !== test)
               .getOrUndefined()).toBe(test)
+    })  
+
+    it('doesnt invoke filter when no value present', () => {
+      maybe().filter(val => fail())
     })  
 
     it('returns retains value when chained filter predicates false', () => {
       const test: string = 'Hello'
       expect(maybe(test)
-              .filter(val => val === test)
+              .filter(val => val !== test)
               .filter(val => false)
               .getOrUndefined()).toBe(test)
     })  
@@ -90,19 +92,32 @@ describe('maybe', () => {
     it('returns empty monad when filter predicate true', () => {
       const test: string = 'Hello'
       expect(maybe(test)
-              .filter(val => val !== test)
+              .filter(val => val === test)
               .getOrUndefined()).toBeUndefined()
     })  
   })  
 
-  describe('from supplier', () => {
-    it('gets value when provided from supplier', () => {
-      const test: string = 'Hello'
-      expect(Maybe.fromSupplier(() => test).getOrUndefined()).toBe(test)
+  describe('do if empty', () => {
+    it('calls function when empty', () => {
+      const notify = jasmine.createSpy().and.callFake(() => false)
+      maybe().doIfEmpty(notify)
+      expect(notify).toHaveBeenCalled()
     })  
 
-    it('has no value when supplier has no value', () => {
-      expect(Maybe.fromSupplier(() => undefined).getOrUndefined()).toBeUndefined()
+    it('does not call function when not empty', () => {
+      maybe('test').doIfEmpty(() => fail())
+    })  
+  })  
+
+  describe('do if present', () => {
+    it('calls function when value present', () => {
+      const notify = jasmine.createSpy().and.callFake(() => false)
+      maybe('test').doIfPresent(notify)
+      expect(notify).toHaveBeenCalled()
+    })  
+
+    it('does not call function when not empty', () => {
+      maybe().doIfPresent(() => fail())
     })  
   })  
 })

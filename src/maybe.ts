@@ -5,16 +5,12 @@ export class Maybe<T> implements Monad<T> {
 
   constructor(private readonly val?: T) { }
 
-  public static fromSupplier(f: () => T): Monad<T> {
-    return maybe(f())
-  } 
-
   public map<U>(f: (t: T) => U): Monad<U> {
     return this.val ? maybe(f(this.val)) : maybe()
   }
 
   public flatMap<U>(f: (t: T) => Monad<U>): Monad<U> {
-    return this.hasValue() ? f(this.val) : maybe()
+    return this.val ? f(this.val) : maybe()
   }
 
   public hasValue(): boolean {
@@ -34,6 +30,18 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public filter(f: (t: T) => boolean): Monad<T> {
-    return f() ? maybe() : this
+    return this.val && f(this.val) ? maybe() : this
+  }
+
+  public doIfEmpty(f: () => void): Monad<T> {
+    if (!this.val) { f() }
+
+    return this
+  }
+
+  public doIfPresent(f: (t: T) => void): Monad<T> {
+    if (this.val) { f(this.val) }
+
+    return this
   }
 }
