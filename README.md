@@ -1,6 +1,12 @@
 # Tonad
 
-
+```
+<p align="center">
+  <a href="https://circleci.com/gh/ShaneLee/tonad.svg?style=svg">
+    <img alt="circeci" src="https://circleci.com/gh/patrickmichalina/typescript-monads.svg?style=shield">
+  </a>
+</p>
+```
 
 Tonad is a basic Monad library for TypeScript. This enables safer code. Make null-pointers a thing of the past with Tonad.
 
