@@ -42,25 +42,15 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public doIfEmpty(f: () => void): Monad<T> {
-    if (!this.val) { f() }
-
-    return maybe()
+    return !this.val ? f() : maybe()
   }
 
   public doIfPresent(f: (t: T) => void): Monad<T> {
-    if (this.val) { f(this.val) }
-
-    return maybe(this.val)
+    return this.val ? f(this.val) : maybe(this.val)
   }
 
   public doOnError(f: (t: T) => void): Monad<T> {
-    if (!this.val) return maybe()
-      if (this.val instanceof Error) {
-        f(this.val) 
-        throw this.val
-      }
-
-    return maybe()
+    return this.val && this.val instanceof Error ? f(this.val) : maybe()
   }
 
   public doOnErrorMatching(p: (t: T) => boolean, f: (t: T) => void): Monad<T> {
