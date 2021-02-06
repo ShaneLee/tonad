@@ -88,13 +88,8 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public onErrorFlatMap<U>(f: (t: T) => Monad<U>): Monad<U> {
-    if (!this.val) return maybe()
-    
-    if (this.val instanceof Error) {
-      return f(this.val as T)
-    }
-
-    return maybe()
+    return this.val && this.val instanceof Error
+      ? f(this.val as T) : maybe()
   }
 
   public onErrorFlatMapMatching<U>(p: (t: T) => boolean, f: (t: T) => Monad<U>): Monad<U> {
