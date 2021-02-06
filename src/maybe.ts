@@ -54,18 +54,11 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public doOnErrorMatching(p: (t: T) => boolean, f: (t: T) => void): Monad<T> {
-    if (!this.val) return maybe()
-      if (this.val instanceof Error && p(this.val)) {
-        f(this.val)
-        throw this.val
-    }
-
-    return maybe()
+    this.val && this.val instanceof Error && p(this.val) ? f(this.val) : maybe()
   }
 
   public onErrorMap<U>(f: (t: T) => U): Monad<U> {
-    return this.val && this.val instanceof Error  
-      ?  maybe(f(this.val)) : maybe()
+    return this.val && this.val instanceof Error ? maybe(f(this.val)) : maybe()
   }
 
   public onErrorMapMatching<U>(p: (t: T) => boolean, f: (t: T) => U): Monad<U> {
@@ -79,14 +72,14 @@ export class Maybe<T> implements Monad<T> {
 
   public onErrorFlatMap<U>(f: (t: T) => Monad<U>): Monad<U> {
     return this.val && this.val instanceof Error
-      ? f(this.val as T) : maybe()
+      ? f(this.val) : maybe()
   }
 
   public onErrorFlatMapMatching<U>(p: (t: T) => boolean, f: (t: T) => Monad<U>): Monad<U> {
     if (!this.val) return maybe()
 
     if (this.val instanceof Error) {
-      return p(this.val) ? f(this.val as T) : this as unknown as Monad<U>
+      return p(this.val) ? f(this.val) : this as unknown as Monad<U>
     }
     
     return maybe()
