@@ -1,4 +1,4 @@
-import { fromSupplier } from '../src/maybe.factory'
+import { fromSupplier } from '../src/tonad'
 
 describe('maybe factory', () => {
   describe('from supplier', () => {

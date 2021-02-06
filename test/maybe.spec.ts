@@ -1,4 +1,4 @@
-import { maybe } from '../src/maybe.factory'
+import { maybe } from '../src/tonad'
 import { TestError } from './test.error'
 
 describe('maybe', () => {
