@@ -55,29 +55,19 @@ export class Maybe<T> implements Monad<T> {
 
   public doOnError(f: (t: T) => void): Monad<T> {
     if (!this.val) return maybe()
-
-    try {
       if (this.val instanceof Error) {
+        f(this.val) 
         throw this.val
       }
-    }
-    catch (e) {
-      f(this.val as T) 
-      throw this.val
-    }
 
     return maybe()
   }
 
   public doOnErrorMatching(p: (t: T) => boolean, f: (t: T) => void): Monad<T> {
     if (!this.val) return maybe()
-
-    try {
-      this.val
-    }
-    catch (e) {
-      if (p(this.val)) { f(this.val) }
-      throw this.val
+      if (this.val instanceof Error && p(this.val)) {
+        f(this.val)
+        throw this.val
     }
 
     return maybe()
@@ -86,12 +76,7 @@ export class Maybe<T> implements Monad<T> {
   public onErrorMap<U>(f: (t: T) => U): Monad<U> {
     if (!this.val) return maybe()
 
-    try {
-      if (this.val instanceof Error) {
-        throw this.val
-      }
-    }
-    catch (e) {
+    if (this.val instanceof Error) {
       return maybe(f(this.val))
     }
     return maybe()
@@ -100,12 +85,7 @@ export class Maybe<T> implements Monad<T> {
   public onErrorMapMatching<U>(p: (t: T) => boolean, f: (t: T) => U): Monad<U> {
     if (!this.val) return maybe()
 
-    try {
-      if (this.val instanceof Error) {
-        throw this.val
-      }
-    }
-    catch (e) {
+    if (this.val instanceof Error) {
       return p(this.val) ? maybe(f(this.val)) : this as unknown as Monad<U>
     }
     return maybe()
@@ -114,12 +94,7 @@ export class Maybe<T> implements Monad<T> {
   public onErrorFlatMap<U>(f: (t: T) => Monad<U>): Monad<U> {
     if (!this.val) return maybe()
     
-    try {
-      if (this.val instanceof Error) {
-        throw this.val
-      }
-    }
-    catch (e) {
+    if (this.val instanceof Error) {
       return f(this.val as T)
     }
 
@@ -129,15 +104,10 @@ export class Maybe<T> implements Monad<T> {
   public onErrorFlatMapMatching<U>(p: (t: T) => boolean, f: (t: T) => Monad<U>): Monad<U> {
     if (!this.val) return maybe()
 
-    try {
-      if (this.val instanceof Error) {
-        throw this.val
-      }
-    }
-    catch (e) {
+    if (this.val instanceof Error) {
       return p(this.val) ? f(this.val as T) : this as unknown as Monad<U>
     }
-
+    
     return maybe()
   }
 
