@@ -50,6 +50,14 @@ export interface Monad<T> {
     orElseGet(t: () => T): T
 
     /**
+     * If this Monad doesn't have a value,
+     * invoke the given supplier and throw the 
+     * error it provides
+     * @param t the supplier function
+     */
+    orElseThrow(t: () => Error): Error
+
+    /**
      * Return true if this Monad has a value
      */
     hasValue(): boolean
@@ -62,7 +70,7 @@ export interface Monad<T> {
     /**
      * Perform a side-effect if this Monad doesn't 
      * contain a value
-     * @param f the consumer function to apply
+     * @param f the function to apply
      */
     doIfEmpty(f: () => void): Monad<T>
  
@@ -72,4 +80,62 @@ export interface Monad<T> {
      * @param f the consumer function apply 
      */
     doIfPresent(f: (t: T) => void): Monad<T>
+
+    /**
+     * Perform a side-effect if this Monad contains 
+     * an Error
+     * @param f the error consumer 
+     */
+    doOnError(f: (t: T) => void): Monad<T>
+
+    /**
+     * Perform a side-effect if this Monad contains
+     * an Error which matches the given predicate function
+     * @param p the predicate function
+     * @param f the error consumer
+     */
+    doOnErrorMatching(p: (t: T) => boolean, f: (t: T) => void): Monad<T>
+
+    /**
+     * Map to an alternative value if this Monad contains an 
+     * error, otherwise retain this Monad
+     * @param f the mapping function providing the alternative
+     * value
+     */
+    onErrorMap<U>(f: (t: T) => U): Monad<U>
+
+    /**
+     * Map to an alternative value if this Monad contains an 
+     * error and it matches the given predicate function, 
+     * otherwise retain this Monad
+     * @param p the predicate function
+     * @param f the mapping function providing the alternative
+     * value
+     */
+    onErrorMapMatching<U>(p: (t: T) => boolean, f: (t: T) => U): Monad<U>
+
+    /**
+     * Map to an alternative Monad if this Monad contains an
+     * error, otherwise retain this Monad
+     * @param f the mapping function providing the alternative
+     * Monad
+     */
+    onErrorFlatMap<U>(f: (t: T) => Monad<U>): Monad<U>
+
+    /**
+     * Map to an alternative Monad if this Monad contains an 
+     * error and it matches the given predicate function,
+     * otherwise retain this Monad
+     * @param p the predicate function
+     * @param f the mapping function providing the alternative
+     * Monad
+     */
+    onErrorFlatMapMatching<U>(p: (t: T) => boolean, f: (t: T) => Monad<U>): Monad<U>
+
+    /**
+     * Switch to an alternative value if the this Monad is empty
+     * otherwise retain this value
+     * @param u the value to provide to a new Monad
+     */
+    switchIfEmpty<U>(u: U): Monad<U>
 }

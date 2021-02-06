@@ -1,4 +1,5 @@
 import { maybe } from '../src/maybe.factory'
+import { TestError } from './test.error'
 
 describe('maybe', () => {
   describe('get or undefined', () => {
@@ -48,12 +49,12 @@ describe('maybe', () => {
   describe('is empty', () => {
     it('doesnt have value', () => {
       expect(maybe().isEmpty()).toBeTruthy()
-    })  
+    }) 
 
     it('has value', () => {
       expect(maybe('test').isEmpty()).toBeFalsy()
-    })  
-  })  
+    }) 
+  }) 
 
   describe('get or default', () => {
     it('gets value when value present', () => {
@@ -76,6 +77,21 @@ describe('maybe', () => {
     it('gets from supplier when no value present', () => {
       const answer: string = '42'
       expect(maybe().orElseGet(() => answer)).toBe(answer)
+    })  
+  })  
+
+  describe('or else throw', () => {
+    it('throws when value not present', () => {
+      try {
+        const error = new Error()
+        expect(maybe().orElseThrow(() => error)).toThrow(error)
+      } catch (e) { }
+    })  
+
+    it('doesnt throw when value not present', () => {
+      try {
+        maybe().orElseThrow(() => new Error())
+      } catch (e) { }
     })  
   })  
 
@@ -128,6 +144,157 @@ describe('maybe', () => {
 
     it('does not call function when not empty', () => {
       maybe().doIfPresent(() => fail())
+    })  
+  })  
+
+  describe('do on error', () => {
+    it('calls function when error present', () => {
+      try {
+        const notify = jasmine.createSpy().and.callFake(() => false)
+        maybe(new Error()).doOnError(notify)
+        expect(notify).toHaveBeenCalled()
+      } catch (e) { }
+    })  
+
+    it('does not call function when not error', () => {
+      maybe('test').doOnError(() => fail())
+    })  
+
+    it('does not call function when empty', () => {
+      maybe().doOnError(() => fail())
+    })  
+  })  
+
+  describe('do on error matching', () => {
+    it('calls function when error present and predicate true', () => {
+      try {
+        const notify = jasmine.createSpy().and.callFake(() => false)
+        maybe(new TestError('test')).doOnErrorMatching(err => err instanceof TestError, notify)
+        expect(notify).toHaveBeenCalled()
+      } catch (e) { }
+    })  
+
+    it('does not call function when error present but predicate false', () => {
+      maybe(new TestError('test')).doOnErrorMatching(err => false, val => fail())
+    })  
+
+    it('does not call function when not error', () => {
+      maybe('test').doOnErrorMatching(err => true, val => fail())
+    })  
+
+    it('does not call function when empty', () => {
+      maybe().doOnErrorMatching(err => true, val => fail())
+    })  
+  })  
+
+  describe('on error map', () => {
+    it('calls function when error present', () => {
+      const test = 'test'
+      expect(maybe(new Error())
+              .onErrorMap(val => test)
+              .getOrUndefined())
+            .toBe(test)
+    })  
+
+    it('does not call function when not error', () => {
+      maybe('test').onErrorMap(val => fail())
+    })  
+
+    it('does not call function when empty', () => {
+      maybe().onErrorMap(val => fail())
+    })  
+  })  
+
+  describe('on error map matching', () => {
+    it('calls function when error present and predicate true', () => {
+      const test = 'test'
+      expect(maybe(new TestError('error'))
+              .onErrorMapMatching(err => err instanceof TestError, val => test)
+              .getOrUndefined())
+            .toBe(test)
+    })  
+
+    it('does not map when error present but predicate false', () => {
+      const error = new Error()
+      expect(maybe(error)
+              .onErrorMapMatching(err => false, val => 'test')
+              .getOrUndefined())
+            .toBe(error)
+    })  
+
+    it('does not call function when not error', () => {
+      maybe('test').onErrorMapMatching(err => true, val => fail())
+    })  
+
+    it('does not call function when empty', () => {
+      maybe().onErrorMapMatching(err => true, val => fail())
+    })  
+  })  
+
+  describe('on error flat map', () => {
+    it('maps when error present', () => {
+      const error = new Error()
+      const test = 'test'
+      expect(maybe(error)
+              .onErrorFlatMap(val => maybe(test))
+              .getOrUndefined())
+            .toBe(test)
+    })  
+
+    it('does not call function when not error', () => {
+      maybe('test').onErrorFlatMap(val => fail())
+    })  
+
+    it('does not call function when empty', () => {
+      maybe().onErrorFlatMap(val => fail())
+    })  
+  })  
+
+  describe('on error flat map matching', () => {
+    it('calls function when error present and predicate true', () => {
+      try {
+        const test = 'test'
+        expect(maybe(new TestError('error'))
+                .onErrorFlatMapMatching(err => err instanceof TestError, val => test)
+                .getOrUndefined())
+              .toBe(test)
+      } catch (e) { }
+    })  
+
+    it('does not map when error present but predicate false', () => {
+      try { 
+        const error = new Error()
+        expect(maybe(error)
+                .onErrorFlatMapMatching(err => false, val => 'test')
+                .getOrUndefined())
+              .toBe(error)
+      } catch (e) { }
+    })  
+
+    it('does not call function when not error', () => {
+      maybe('test').onErrorFlatMapMatching(err => true, val => fail())
+    })  
+
+    it('does not call function when empty', () => {
+      maybe().onErrorFlatMapMatching(err => true, val => fail())
+    })  
+  })  
+
+  describe('switch if empty', () => {
+    it('switches to alternative monad when no value present', () => {
+      const test = 'test'
+      expect(maybe()
+              .switchIfEmpty(test)
+              .getOrUndefined())
+            .toBe(test)
+    })  
+
+    it('does not switch when value present', () => {
+      const test = 'test'
+      expect(maybe(test)
+              .switchIfEmpty('switched')
+              .getOrUndefined())
+            .toBe(test)
     })  
   })  
 })
