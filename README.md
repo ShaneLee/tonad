@@ -1,6 +1,6 @@
 # 🦶Tonad
 
-[Circle CI] (https://circleci.com/gh/ShaneLee/tonad.svg?style=svg)
+![Circle CI](https://circleci.com/gh/ShaneLee/tonad.svg)
 
 Tonad is a basic Monad library for TypeScript. This enables safer code. Make null-pointers a thing of the past with Tonad.
 
