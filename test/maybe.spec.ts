@@ -45,6 +45,16 @@ describe('maybe', () => {
     })  
   })  
 
+  describe('is empty', () => {
+    it('doesnt have value', () => {
+      expect(maybe().isEmpty()).toBeTruthy()
+    })  
+
+    it('has value', () => {
+      expect(maybe('test').isEmpty()).toBeFalsy()
+    })  
+  })  
+
   describe('get or default', () => {
     it('gets value when value present', () => {
       const test: string = 'Hello'

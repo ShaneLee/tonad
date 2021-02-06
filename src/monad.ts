@@ -55,6 +55,11 @@ export interface Monad<T> {
     hasValue(): boolean
 
     /**
+     * Return true if this Monad is Empty
+     */
+    isEmpty(): boolean
+
+    /**
      * Perform a side-effect if this Monad doesn't 
      * contain a value
      * @param f the consumer function to apply

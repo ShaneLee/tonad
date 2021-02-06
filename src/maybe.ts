@@ -16,6 +16,10 @@ export class Maybe<T> implements Monad<T> {
   public hasValue(): boolean {
     return !!this.val
   }
+
+  public isEmpty(): boolean {
+    return !this.val
+  }
   
   public getOrUndefined(): T | undefined {
     return this.val ?? undefined 
