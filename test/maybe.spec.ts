@@ -96,10 +96,10 @@ describe('maybe', () => {
   })  
 
   describe('filter', () => {
-    it('returns retains value when filter predicate false', () => {
+    it('returns retains value when filter predicate true', () => {
       const test: string = 'Hello'
       expect(maybe(test)
-              .filter(val => val !== test)
+              .filter(val => val === test)
               .getOrUndefined()).toBe(test)
     })  
 
@@ -107,18 +107,18 @@ describe('maybe', () => {
       maybe().filter(val => fail())
     })  
 
-    it('returns retains value when chained filter predicates false', () => {
-      const test: string = 'Hello'
-      expect(maybe(test)
-              .filter(val => val !== test)
-              .filter(val => false)
-              .getOrUndefined()).toBe(test)
-    })  
-
-    it('returns empty monad when filter predicate true', () => {
+    it('returns retains value when chained filter predicates true', () => {
       const test: string = 'Hello'
       expect(maybe(test)
               .filter(val => val === test)
+              .filter(val => true)
+              .getOrUndefined()).toBe(test)
+    })  
+
+    it('returns empty monad when filter predicate false', () => {
+      const test: string = 'Hello'
+      expect(maybe(test)
+              .filter(val => val !== test)
               .getOrUndefined()).toBeUndefined()
     })  
   })  

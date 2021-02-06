@@ -38,7 +38,7 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public filter(f: (t: T) => boolean): Monad<T> {
-    return this.val && f(this.val) ? maybe() : maybe(this.val)
+    return this.val && f(this.val) ? maybe(this.val) : maybe()
   }
 
   public doIfEmpty(f: () => void): Monad<T> {
