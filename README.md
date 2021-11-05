@@ -42,11 +42,11 @@ import { maybe, fromSupplier, Monad } from 'tonad'
 
 public process(requestID: string | undefined): void {
   maybe(requestId) // create a null-safe monad
-  	.flatMap(val => findNumberOfUsers()) // Call API that may return value or error
+    .flatMap(val => findNumberOfUsers()) // Call API that may return value or error
     .doIfEmpty(() => console.log('No request ID provided')) // If nothing is returned, log
-		.doOnError(err => console.log(`Error processing error: ${err}`)) // Log if error thrown
-		.onErrorMap(err => 0) // If there is an error, switch to this value
-		.switchIfEmpty(0) // If there is no value, switch to this value
+    .doOnError(err => console.log(`Error processing error: ${err}`)) // Log if error thrown
+    .onErrorMap(err => 0) // If there is an error, switch to this value
+    .switchIfEmpty(0) // If there is no value, switch to this value
 }
 
 private findNumberOfUsers(): Monad<number> {
