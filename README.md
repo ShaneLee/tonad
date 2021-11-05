@@ -30,7 +30,7 @@ const value: number = maybe('example') // create a Monad<string>
 	.doIfEmpty(() => console.log('maybe is empty now')) // this will execute because it's empty
 	.flatMap(val => Maybe(new Object())) // as maybe is empty this won't execute
 	.switchIfEmpty(10) // When empty use this value - note it's a different type to the original
-  .filter(val => val % 2 == 0) // another filter
+        .filter(val => val % 2 == 0) // another filter
 	.switchIfEmpty(15) // Won't execute as not empty
 	.getOrUndefined() // will return 10 hence value being of type number
 ```
