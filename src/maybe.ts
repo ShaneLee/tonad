@@ -98,4 +98,8 @@ export class Maybe<T> implements Monad<T> {
   public switchIfEmpty<U>(u: U): Monad<U> {
     return !this.val ? maybe(u) : this as unknown as Monad<U>
   }
+
+  public or<U>(f: () => Monad<U>): Monad<U> {
+    return !this.val ? f() : this as unknown as Monad<U>
+  }
 }

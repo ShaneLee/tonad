@@ -295,6 +295,24 @@ describe('maybe', () => {
               .switchIfEmpty('switched')
               .getOrUndefined())
             .toBe(test)
-    })  
+    })
+  })
+
+  describe('or', () => {
+    it('switches to the alternative monad when no value present', () => {
+      const test = 'test'
+      expect(maybe()
+              .or(() => maybe(test))
+              .getOrUndefined())
+            .toBe(test)
+    })
+
+    it('does not switch when value present', () => {
+      const test = 'test'
+      expect(maybe(test)
+              .or(() => maybe(test))
+              .getOrUndefined())
+            .toBe(test)
+    })
   })  
 })

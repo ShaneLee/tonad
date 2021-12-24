@@ -138,4 +138,10 @@ export interface Monad<T> {
      * @param u the value to provide to a new Monad
      */
     switchIfEmpty<U>(u: U): Monad<U>
+
+    /**
+     * Switch to an alternative Monad if the this Monad is empty
+     * @param f the supplier of the alternative Monad
+     */
+    or<U>(f: () => Monad<U>): Monad<U>
 }
