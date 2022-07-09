@@ -33,8 +33,8 @@ export class Maybe<T> implements Monad<T> {
     return this.val ?? f()
   }
 
-  public orElseThrow(t: () => Error): Error {
-    throw t()
+  public orElseThrow(t: () => Error): void {
+    if (!this.val) throw t();
   }
 
   public filter(f: (t: T) => boolean): Monad<T> {
