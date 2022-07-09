@@ -55,7 +55,7 @@ export interface Monad<T> {
      * error it provides
      * @param t the supplier function
      */
-    orElseThrow(t: () => Error): Error
+    orElseThrow(t: () => Error): void
 
     /**
      * Return true if this Monad has a value

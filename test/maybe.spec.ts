@@ -82,16 +82,12 @@ describe('maybe', () => {
 
   describe('or else throw', () => {
     it('throws when value not present', () => {
-      try {
-        const error = new Error()
-        expect(maybe().orElseThrow(() => error)).toThrow(error)
-      } catch (e) { }
+      const error = new Error()
+      expect(() => maybe().orElseThrow(() => error)).toThrow(error)
     })  
 
-    it('doesnt throw when value not present', () => {
-      try {
-        maybe().orElseThrow(() => new Error())
-      } catch (e) { }
+    it('doesnt throw when value present', () => {
+      expect(() => maybe("some value").orElseThrow(() => new Error())).not.toThrow();
     })  
   })  
 
