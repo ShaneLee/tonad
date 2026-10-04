@@ -6,7 +6,7 @@ export interface Monad<T> {
      * Does nothing if Monad has no value
      * @param f the mapping function
      */
-    map<U>(f: (t: T) => U): Monad<U>
+    map<U>(f: (t: T) => U): Monad<NonNullable<U>>
 
     /**
      * If this Monad contains a value, apply
@@ -86,7 +86,7 @@ export interface Monad<T> {
      * an Error
      * @param f the error consumer 
      */
-    doOnError(f: (t: T) => void): Monad<T>
+    doOnError(f: (e: T & Error) => void): Monad<T>
 
     /**
      * Perform a side-effect if this Monad contains
@@ -94,7 +94,7 @@ export interface Monad<T> {
      * @param p the predicate function
      * @param f the error consumer
      */
-    doOnErrorMatching(p: (t: T) => boolean, f: (t: T) => void): Monad<T>
+    doOnErrorMatching(p: (e: T & Error) => boolean, f: (e: T & Error) => void): Monad<T>
 
     /**
      * Map to an alternative value if this Monad contains an 
@@ -102,7 +102,7 @@ export interface Monad<T> {
      * @param f the mapping function providing the alternative
      * value
      */
-    onErrorMap<U>(f: (t: T) => U): Monad<U>
+    onErrorMap<U>(f: (e: T & Error) => U): Monad<Exclude<T, Error> | NonNullable<U>>
 
     /**
      * Map to an alternative value if this Monad contains an 
@@ -112,7 +112,7 @@ export interface Monad<T> {
      * @param f the mapping function providing the alternative
      * value
      */
-    onErrorMapMatching<U>(p: (t: T) => boolean, f: (t: T) => U): Monad<U>
+    onErrorMapMatching<U>(p: (e: T & Error) => boolean, f: (e: T & Error) => U): Monad<T | NonNullable<U>>
 
     /**
      * Map to an alternative Monad if this Monad contains an
@@ -120,7 +120,7 @@ export interface Monad<T> {
      * @param f the mapping function providing the alternative
      * Monad
      */
-    onErrorFlatMap<U>(f: (t: T) => Monad<U>): Monad<U>
+    onErrorFlatMap<U>(f: (e: T & Error) => Monad<U>): Monad<Exclude<T, Error> | U>
 
     /**
      * Map to an alternative Monad if this Monad contains an 
@@ -130,18 +130,18 @@ export interface Monad<T> {
      * @param f the mapping function providing the alternative
      * Monad
      */
-    onErrorFlatMapMatching<U>(p: (t: T) => boolean, f: (t: T) => Monad<U>): Monad<U>
+    onErrorFlatMapMatching<U>(p: (e: T & Error) => boolean, f: (e: T & Error) => Monad<U>): Monad<T | U>
 
     /**
      * Switch to an alternative value if the this Monad is empty
      * otherwise retain this value
      * @param u the value to provide to a new Monad
      */
-    switchIfEmpty<U>(u: U): Monad<U>
+    switchIfEmpty<U>(u: U): Monad<T | NonNullable<U>>
 
     /**
      * Switch to an alternative Monad if the this Monad is empty
      * @param f the supplier of the alternative Monad
      */
-    or<U>(f: () => Monad<U>): Monad<U>
+    or<U>(f: () => Monad<U>): Monad<T | U>
 }
