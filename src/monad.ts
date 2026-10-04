@@ -50,12 +50,12 @@ export interface Monad<T> {
     orElseGet(t: () => T): T
 
     /**
-     * If this Monad doesn't have a value,
-     * invoke the given supplier and throw the 
-     * error it provides
+     * If this Monad has a value, return it;
+     * else invoke the given supplier and throw
+     * the error it provides
      * @param t the supplier function
      */
-    orElseThrow(t: () => Error): void
+    orElseThrow(t: () => Error): T
 
     /**
      * Return true if this Monad has a value

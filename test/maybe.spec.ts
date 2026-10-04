@@ -114,6 +114,15 @@ describe('maybe', () => {
     it('doesnt throw when value present', () => {
       expect(() => maybe("some value").orElseThrow(() => new Error())).not.toThrow();
     })  
+
+    it('returns value when value present', () => {
+      const test: string = 'Hello'
+      expect(maybe(test).orElseThrow(() => new Error())).toBe(test)
+    })
+
+    it('returns falsy value when value present', () => {
+      expect(maybe(0).orElseThrow(() => new Error())).toBe(0)
+    })
   })  
 
   describe('filter', () => {
