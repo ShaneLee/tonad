@@ -221,6 +221,10 @@ describe('maybe', () => {
       maybe('test').onErrorMap(val => fail())
     })  
 
+    it('retains value when not error', () => {
+      expect(maybe('test').onErrorMap(val => 'mapped').getOrUndefined()).toBe('test')
+    })
+
     it('does not call function when empty', () => {
       maybe().onErrorMap(val => fail())
     })  
@@ -247,6 +251,13 @@ describe('maybe', () => {
       maybe('test').onErrorMapMatching(err => true, val => fail())
     })  
 
+    it('retains value when not error', () => {
+      expect(maybe('test')
+              .onErrorMapMatching(err => true, val => 'mapped')
+              .getOrUndefined())
+            .toBe('test')
+    })
+
     it('does not call function when empty', () => {
       maybe().onErrorMapMatching(err => true, val => fail())
     })  
@@ -265,6 +276,13 @@ describe('maybe', () => {
     it('does not call function when not error', () => {
       maybe('test').onErrorFlatMap(val => fail())
     })  
+
+    it('retains value when not error', () => {
+      expect(maybe('test')
+              .onErrorFlatMap(val => maybe('mapped'))
+              .getOrUndefined())
+            .toBe('test')
+    })
 
     it('does not call function when empty', () => {
       maybe().onErrorFlatMap(val => fail())
@@ -295,6 +313,21 @@ describe('maybe', () => {
     it('does not call function when not error', () => {
       maybe('test').onErrorFlatMapMatching(err => true, val => fail())
     })  
+
+    it('retains value when not error', () => {
+      expect(maybe('test')
+              .onErrorFlatMapMatching(err => true, val => maybe('mapped'))
+              .getOrUndefined())
+            .toBe('test')
+    })
+
+    it('retains error when predicate false', () => {
+      const error = new Error()
+      expect(maybe(error)
+              .onErrorFlatMapMatching(err => false, val => maybe('mapped'))
+              .getOrUndefined())
+            .toBe(error)
+    })
 
     it('does not call function when empty', () => {
       maybe().onErrorFlatMapMatching(err => true, val => fail())

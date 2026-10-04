@@ -70,31 +70,23 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public onErrorMap<U>(f: (t: T) => U): Monad<U> {
-    return isPresent(this.val) && this.val instanceof Error ? maybe(f(this.val)) : maybe()
+    return isPresent(this.val) && this.val instanceof Error
+      ? maybe(f(this.val)) : this as unknown as Monad<U>
   }
 
   public onErrorMapMatching<U>(p: (t: T) => boolean, f: (t: T) => U): Monad<U> {
-    if (!isPresent(this.val)) return maybe()
-
-    if (this.val instanceof Error) {
-      return p(this.val) ? maybe(f(this.val)) : this as unknown as Monad<U>
-    }
-    return maybe()
+    return isPresent(this.val) && this.val instanceof Error && p(this.val)
+      ? maybe(f(this.val)) : this as unknown as Monad<U>
   }
 
   public onErrorFlatMap<U>(f: (t: T) => Monad<U>): Monad<U> {
     return isPresent(this.val) && this.val instanceof Error
-      ? f(this.val) : maybe()
+      ? f(this.val) : this as unknown as Monad<U>
   }
 
   public onErrorFlatMapMatching<U>(p: (t: T) => boolean, f: (t: T) => Monad<U>): Monad<U> {
-    if (!isPresent(this.val)) return maybe()
-
-    if (this.val instanceof Error) {
-      return p(this.val) ? f(this.val) : this as unknown as Monad<U>
-    }
-    
-    return maybe()
+    return isPresent(this.val) && this.val instanceof Error && p(this.val)
+      ? f(this.val) : this as unknown as Monad<U>
   }
 
   public switchIfEmpty<U>(u: U): Monad<U> {
