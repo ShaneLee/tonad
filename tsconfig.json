@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "incremental": true,
     "target": "es2017",
     "outDir": "build/main",
     "rootDir": "src",
@@ -30,9 +29,8 @@
     "listFiles": false,
     "pretty": true,
 
-    "lib": ["es2017", "dom"],
-    "types": ["node"],
-    "typeRoots": ["node_modules/@types", "src/types"]
+    "lib": ["es2017"],
+    "types": []
   },
   "include": ["src/**/*.ts"],
   "exclude": ["node_modules/**"],

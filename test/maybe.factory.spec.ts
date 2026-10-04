@@ -3,13 +3,13 @@ import { fromSupplier } from '../src/tonad'
 describe('maybe factory', () => {
   describe('from supplier', () => {
     it('gets value when provided from supplier', () => {
-      const test: string = 'Hello'
+      const test = 'Hello'
       expect(fromSupplier(() => test).getOrUndefined()).toBe(test)
-    })  
+    })
 
     it('has no value when supplier has no value', () => {
       expect(fromSupplier(() => undefined).getOrUndefined()).toBeUndefined()
-    })  
+    })
 
     it('captures error thrown by supplier', () => {
       const error = new Error('boom')
@@ -31,5 +31,5 @@ describe('maybe factory', () => {
             .toBe(0)
       expect(notify).toHaveBeenCalled()
     })
-  })  
+  })
 })

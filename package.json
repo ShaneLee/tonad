@@ -1,13 +1,23 @@
 {
   "name": "tonad",
-  "version": "1.0.4",
+  "version": "2.0.0",
   "description": "A TypeScript monad library",
+  "main": "build/main/tonad.js",
+  "types": "build/main/tonad.d.ts",
+  "files": [
+    "build/main",
+    "LICENSE-MIT"
+  ],
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "build": "tsc -p .",
+    "typecheck": "tsc --noEmit -p tsconfig.test.json",
+    "pretest": "npm run typecheck",
     "test": "jest",
-    "lint": "eslint src/**"
+    "lint": "eslint src test --ext .ts",
+    "prepublishOnly": "npm run lint && npm test && npm run build"
   },
   "repository": {
     "type": "git",
@@ -28,10 +38,13 @@
   },
   "homepage": "https://github.com/ShaneLee/tonad#readme",
   "devDependencies": {
-    "@types/jest": "^26.0.15",
-    "@typescript-eslint/eslint-plugin": "^4.14.2",
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-typescript": "^7.12.7",
-    "jest": "^26.6.3"
+    "@types/jest": "^26.0.15",
+    "@typescript-eslint/eslint-plugin": "^4.14.2",
+    "@typescript-eslint/parser": "^4.14.2",
+    "eslint": "^7.19.0",
+    "jest": "^26.6.3",
+    "typescript": "^4.1.3"
   }
 }

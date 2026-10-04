@@ -1,18 +1,23 @@
 import { Monad } from './monad'
-import { maybe } from './maybe.factory'
 
 const isPresent = <T>(val: T | null | undefined): val is T => val !== undefined && val !== null
 
 export class Maybe<T> implements Monad<T> {
 
+  private static readonly EMPTY: Monad<never> = new Maybe<never>()
+
   constructor(private readonly val?: T | null) { }
 
+  public static of<T>(val?: T | null): Monad<NonNullable<T>> {
+    return isPresent(val) ? new Maybe(val as NonNullable<T>) : Maybe.EMPTY
+  }
+
   public map<U>(f: (t: T) => U): Monad<NonNullable<U>> {
-    return isPresent(this.val) ? maybe(f(this.val)) : maybe()
+    return isPresent(this.val) ? Maybe.of(f(this.val)) : Maybe.EMPTY
   }
 
   public flatMap<U>(f: (t: T) => Monad<U>): Monad<U> {
-    return isPresent(this.val) ? f(this.val) : maybe()
+    return isPresent(this.val) ? f(this.val) : Maybe.EMPTY
   }
 
   public hasValue(): boolean {
@@ -22,13 +27,13 @@ export class Maybe<T> implements Monad<T> {
   public isEmpty(): boolean {
     return !isPresent(this.val)
   }
-  
+
   public getOrUndefined(): T | undefined {
-    return this.val ?? undefined 
+    return this.val ?? undefined
   }
 
   public getOrDefault(t: T): T {
-    return this.val ?? t 
+    return this.val ?? t
   }
 
   public orElseGet(f: () => T): T {
@@ -41,7 +46,7 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public filter(f: (t: T) => boolean): Monad<T> {
-    return isPresent(this.val) && f(this.val) ? maybe(this.val) : maybe()
+    return isPresent(this.val) && f(this.val) ? this : Maybe.EMPTY
   }
 
   public doIfEmpty(f: () => void): Monad<T> {
@@ -66,12 +71,12 @@ export class Maybe<T> implements Monad<T> {
 
   public onErrorMap<U>(f: (e: T & Error) => U): Monad<Exclude<T, Error> | NonNullable<U>> {
     return isPresent(this.val) && this.val instanceof Error
-      ? maybe(f(this.val)) : this as unknown as Monad<Exclude<T, Error>>
+      ? Maybe.of(f(this.val)) : this as unknown as Monad<Exclude<T, Error>>
   }
 
   public onErrorMapMatching<U>(p: (e: T & Error) => boolean, f: (e: T & Error) => U): Monad<T | NonNullable<U>> {
     return isPresent(this.val) && this.val instanceof Error && p(this.val)
-      ? maybe(f(this.val)) : this
+      ? Maybe.of(f(this.val)) : this
   }
 
   public onErrorFlatMap<U>(f: (e: T & Error) => Monad<U>): Monad<Exclude<T, Error> | U> {
@@ -85,7 +90,7 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public switchIfEmpty<U>(u: U): Monad<T | NonNullable<U>> {
-    return !isPresent(this.val) ? maybe(u) : this
+    return !isPresent(this.val) ? Maybe.of(u) : this
   }
 
   public or<U>(f: () => Monad<U>): Monad<T | U> {

@@ -1,3 +1,3 @@
-export class TestError extends Error { 
+export class TestError extends Error {
   constructor(message: string) { super(message) }
 }

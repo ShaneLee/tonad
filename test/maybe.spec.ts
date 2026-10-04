@@ -4,14 +4,14 @@ import { TestError } from './test.error'
 describe('maybe', () => {
   describe('get or undefined', () => {
     it('gets when maybe has value', () => {
-      const test: string = 'Hello'
+      const test = 'Hello'
       expect(maybe(test).getOrUndefined()).toBe(test)
-    })  
+    })
 
     it('gets undefined when no value present', () => {
       expect(maybe().getOrUndefined()).toBeUndefined()
-    })  
-  })  
+    })
+  })
 
   describe('falsy values', () => {
     it.each([0, '', false, NaN])('treats %p as a present value', (val) => {
@@ -41,154 +41,171 @@ describe('maybe', () => {
   describe('map', () => {
     it('maps values', () => {
       expect(maybe('Hello').map(val => val + '1').getOrUndefined()).toBe('Hello1')
-    })  
+    })
 
     it('doesnt map when no value present', () => {
-      maybe().map(val => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().map(f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('flatMap', () => {
     it('flatMaps values', () => {
       expect(maybe(maybe('Hello'))
               .flatMap(monad => monad.map(val => val + '2'))
               .getOrUndefined()).toBe('Hello2')
-    })  
+    })
 
     it('doesnt flapMap when no value present', () => {
-      maybe().flatMap(monad => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().flatMap(f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
 
   describe('has value', () => {
     it('has value', () => {
       expect(maybe('test').hasValue()).toBeTruthy()
-    })  
+    })
 
     it('doesnt have value', () => {
       expect(maybe().hasValue()).toBeFalsy()
-    })  
-  })  
+    })
+  })
 
   describe('is empty', () => {
     it('doesnt have value', () => {
       expect(maybe().isEmpty()).toBeTruthy()
-    }) 
+    })
 
     it('has value', () => {
       expect(maybe('test').isEmpty()).toBeFalsy()
-    }) 
-  }) 
+    })
+  })
 
   describe('get or default', () => {
     it('gets value when value present', () => {
-      const test: string = 'Hello'
+      const test = 'Hello'
       expect(maybe(test).getOrDefault('')).toBe(test)
-    })  
+    })
 
     it('gets from default value when no value present', () => {
-      const answer: string = '42'
+      const answer = '42'
       expect(maybe().getOrDefault(answer)).toBe(answer)
-    })  
-  })  
+    })
+  })
 
   describe('or else get', () => {
     it('gets value when value present', () => {
-      const test: string = 'Hello'
-      expect(maybe(test).orElseGet(() => fail())).toBe(test)
-    })  
+      const test = 'Hello'
+      const f = jest.fn()
+      expect(maybe(test).orElseGet(f)).toBe(test)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('gets from supplier when no value present', () => {
-      const answer: string = '42'
+      const answer = '42'
       expect(maybe().orElseGet(() => answer)).toBe(answer)
-    })  
-  })  
+    })
+  })
 
   describe('or else throw', () => {
     it('throws when value not present', () => {
       const error = new Error()
       expect(() => maybe().orElseThrow(() => error)).toThrow(error)
-    })  
+    })
 
     it('doesnt throw when value present', () => {
-      expect(() => maybe("some value").orElseThrow(() => new Error())).not.toThrow();
-    })  
+      expect(() => maybe('some value').orElseThrow(() => new Error())).not.toThrow()
+    })
 
     it('returns value when value present', () => {
-      const test: string = 'Hello'
+      const test = 'Hello'
       expect(maybe(test).orElseThrow(() => new Error())).toBe(test)
     })
 
     it('returns falsy value when value present', () => {
       expect(maybe(0).orElseThrow(() => new Error())).toBe(0)
     })
-  })  
+  })
 
   describe('filter', () => {
     it('returns retains value when filter predicate true', () => {
-      const test: string = 'Hello'
+      const test = 'Hello'
       expect(maybe(test)
               .filter(val => val === test)
               .getOrUndefined()).toBe(test)
-    })  
+    })
 
     it('doesnt invoke filter when no value present', () => {
-      maybe().filter(val => fail())
-    })  
+      const f = jest.fn()
+      maybe().filter(f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('returns retains value when chained filter predicates true', () => {
-      const test: string = 'Hello'
+      const test = 'Hello'
       expect(maybe(test)
               .filter(val => val === test)
-              .filter(val => true)
+              .filter(() => true)
               .getOrUndefined()).toBe(test)
-    })  
+    })
+
+    it('returns the same monad when filter predicate true', () => {
+      const monad = maybe('Hello')
+      expect(monad.filter(() => true)).toBe(monad)
+    })
 
     it('returns empty monad when filter predicate false', () => {
-      const test: string = 'Hello'
+      const test = 'Hello'
       expect(maybe(test)
               .filter(val => val !== test)
               .getOrUndefined()).toBeUndefined()
-    })  
-  })  
+    })
+  })
 
   describe('do if empty', () => {
     it('calls function when empty', () => {
-      const notify = jasmine.createSpy().and.callFake(() => false)
+      const notify = jest.fn()
       maybe().doIfEmpty(notify)
       expect(notify).toHaveBeenCalled()
-    })  
+    })
 
     it('does not call function when not empty', () => {
-      maybe('test').doIfEmpty(() => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe('test').doIfEmpty(f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('do if present', () => {
     it('calls function when value present', () => {
-      const notify = jasmine.createSpy().and.callFake(() => false)
+      const notify = jest.fn()
       maybe('test').doIfPresent(notify)
       expect(notify).toHaveBeenCalled()
-    })  
+    })
 
     it('does not call function when not empty', () => {
-      maybe().doIfPresent(() => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().doIfPresent(f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('do on error', () => {
     it('calls function when error present', () => {
-      try {
-        const notify = jasmine.createSpy().and.callFake(() => false)
-        maybe(new Error()).doOnError(notify)
-        expect(notify).toHaveBeenCalled()
-      } catch (e) { }
-    })  
+      const notify = jest.fn()
+      maybe(new Error()).doOnError(notify)
+      expect(notify).toHaveBeenCalled()
+    })
 
     it('does not call function when not error', () => {
-      maybe('test').doOnError(() => fail())
-    })  
+      const f = jest.fn()
+      maybe('test').doOnError(f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('retains value when not error', () => {
       expect(maybe('test').doOnError(() => undefined).getOrUndefined()).toBe('test')
@@ -200,30 +217,34 @@ describe('maybe', () => {
     })
 
     it('does not call function when empty', () => {
-      maybe().doOnError(() => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().doOnError(f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('do on error matching', () => {
     it('calls function when error present and predicate true', () => {
-      try {
-        const notify = jasmine.createSpy().and.callFake(() => false)
-        maybe(new TestError('test')).doOnErrorMatching(err => err instanceof TestError, notify)
-        expect(notify).toHaveBeenCalled()
-      } catch (e) { }
-    })  
+      const notify = jest.fn()
+      maybe(new TestError('test')).doOnErrorMatching(err => err instanceof TestError, notify)
+      expect(notify).toHaveBeenCalled()
+    })
 
     it('does not call function when error present but predicate false', () => {
-      maybe(new TestError('test')).doOnErrorMatching(err => false, val => fail())
-    })  
+      const f = jest.fn()
+      maybe(new TestError('test')).doOnErrorMatching(() => false, f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('does not call function when not error', () => {
-      maybe('test').doOnErrorMatching(err => true, val => fail())
-    })  
+      const f = jest.fn()
+      maybe('test').doOnErrorMatching(() => true, f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('retains value when not error', () => {
       expect(maybe('test')
-              .doOnErrorMatching(err => true, val => undefined)
+              .doOnErrorMatching(() => true, () => undefined)
               .getOrUndefined())
             .toBe('test')
     })
@@ -231,7 +252,7 @@ describe('maybe', () => {
     it('retains error when predicate false', () => {
       const error = new Error()
       expect(maybe(error)
-              .doOnErrorMatching(err => false, val => undefined)
+              .doOnErrorMatching(() => false, () => undefined)
               .getOrUndefined())
             .toBe(error)
     })
@@ -239,125 +260,137 @@ describe('maybe', () => {
     it('retains error when predicate true', () => {
       const error = new Error()
       expect(maybe(error)
-              .doOnErrorMatching(err => true, val => undefined)
+              .doOnErrorMatching(() => true, () => undefined)
               .getOrUndefined())
             .toBe(error)
     })
 
     it('does not call function when empty', () => {
-      maybe().doOnErrorMatching(err => true, val => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().doOnErrorMatching(() => true, f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('on error map', () => {
     it('calls function when error present', () => {
       const test = 'test'
       expect(maybe(new Error())
-              .onErrorMap(val => test)
+              .onErrorMap(() => test)
               .getOrUndefined())
             .toBe(test)
-    })  
+    })
 
     it('does not call function when not error', () => {
-      maybe('test').onErrorMap(val => fail())
-    })  
+      const f = jest.fn()
+      maybe('test').onErrorMap(f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('retains value when not error', () => {
-      expect(maybe('test').onErrorMap(val => 'mapped').getOrUndefined()).toBe('test')
+      expect(maybe('test').onErrorMap(() => 'mapped').getOrUndefined()).toBe('test')
     })
 
     it('does not call function when empty', () => {
-      maybe().onErrorMap(val => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().onErrorMap(f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('on error map matching', () => {
     it('calls function when error present and predicate true', () => {
       const test = 'test'
       expect(maybe(new TestError('error'))
-              .onErrorMapMatching(err => err instanceof TestError, val => test)
+              .onErrorMapMatching(err => err instanceof TestError, () => test)
               .getOrUndefined())
             .toBe(test)
-    })  
+    })
 
     it('does not map when error present but predicate false', () => {
       const error = new Error()
       expect(maybe(error)
-              .onErrorMapMatching(err => false, val => 'test')
+              .onErrorMapMatching(() => false, () => 'test')
               .getOrUndefined())
             .toBe(error)
-    })  
+    })
 
     it('does not call function when not error', () => {
-      maybe('test').onErrorMapMatching(err => true, val => fail())
-    })  
+      const f = jest.fn()
+      maybe('test').onErrorMapMatching(() => true, f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('retains value when not error', () => {
       expect(maybe('test')
-              .onErrorMapMatching(err => true, val => 'mapped')
+              .onErrorMapMatching(() => true, () => 'mapped')
               .getOrUndefined())
             .toBe('test')
     })
 
     it('does not call function when empty', () => {
-      maybe().onErrorMapMatching(err => true, val => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().onErrorMapMatching(() => true, f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('on error flat map', () => {
     it('maps when error present', () => {
       const error = new Error()
       const test = 'test'
       expect(maybe(error)
-              .onErrorFlatMap(val => maybe(test))
+              .onErrorFlatMap(() => maybe(test))
               .getOrUndefined())
             .toBe(test)
-    })  
+    })
 
     it('does not call function when not error', () => {
-      maybe('test').onErrorFlatMap(val => fail())
-    })  
+      const f = jest.fn()
+      maybe('test').onErrorFlatMap(f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('retains value when not error', () => {
       expect(maybe('test')
-              .onErrorFlatMap(val => maybe('mapped'))
+              .onErrorFlatMap(() => maybe('mapped'))
               .getOrUndefined())
             .toBe('test')
     })
 
     it('does not call function when empty', () => {
-      maybe().onErrorFlatMap(val => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().onErrorFlatMap(f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('on error flat map matching', () => {
     it('calls function when error present and predicate true', () => {
-      try {
-        const test = 'test'
-        expect(maybe(new TestError('error'))
-                .onErrorFlatMapMatching(err => err instanceof TestError, val => test)
-                .getOrUndefined())
-              .toBe(test)
-      } catch (e) { }
-    })  
+      const test = 'test'
+      expect(maybe(new TestError('error'))
+              .onErrorFlatMapMatching(err => err instanceof TestError, () => maybe(test))
+              .getOrUndefined())
+            .toBe(test)
+    })
 
     it('does not map when error present but predicate false', () => {
-      try { 
-        const error = new Error()
-        expect(maybe(error)
-                .onErrorFlatMapMatching(err => false, val => 'test')
-                .getOrUndefined())
-              .toBe(error)
-      } catch (e) { }
-    })  
+      const error = new Error()
+      expect(maybe(error)
+              .onErrorFlatMapMatching(() => false, () => maybe('test'))
+              .getOrUndefined())
+            .toBe(error)
+    })
 
     it('does not call function when not error', () => {
-      maybe('test').onErrorFlatMapMatching(err => true, val => fail())
-    })  
+      const f = jest.fn()
+      maybe('test').onErrorFlatMapMatching(() => true, f)
+      expect(f).not.toHaveBeenCalled()
+    })
 
     it('retains value when not error', () => {
       expect(maybe('test')
-              .onErrorFlatMapMatching(err => true, val => maybe('mapped'))
+              .onErrorFlatMapMatching(() => true, () => maybe('mapped'))
               .getOrUndefined())
             .toBe('test')
     })
@@ -365,15 +398,17 @@ describe('maybe', () => {
     it('retains error when predicate false', () => {
       const error = new Error()
       expect(maybe(error)
-              .onErrorFlatMapMatching(err => false, val => maybe('mapped'))
+              .onErrorFlatMapMatching(() => false, () => maybe('mapped'))
               .getOrUndefined())
             .toBe(error)
     })
 
     it('does not call function when empty', () => {
-      maybe().onErrorFlatMapMatching(err => true, val => fail())
-    })  
-  })  
+      const f = jest.fn()
+      maybe().onErrorFlatMapMatching(() => true, f)
+      expect(f).not.toHaveBeenCalled()
+    })
+  })
 
   describe('switch if empty', () => {
     it('switches to alternative monad when no value present', () => {
@@ -382,7 +417,7 @@ describe('maybe', () => {
               .switchIfEmpty(test)
               .getOrUndefined())
             .toBe(test)
-    })  
+    })
 
     it('does not switch when value present', () => {
       const test = 'test'
@@ -409,5 +444,5 @@ describe('maybe', () => {
               .getOrUndefined())
             .toBe(test)
     })
-  })  
+  })
 })
