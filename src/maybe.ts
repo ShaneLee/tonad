@@ -54,19 +54,13 @@ export class Maybe<T> implements Monad<T> {
   }
 
   public doOnError(f: (t: T) => void): Monad<T> {
-    if (!isPresent(this.val)) return maybe()
-    if (this.val instanceof Error) f(this.val)
+    if (isPresent(this.val) && this.val instanceof Error) f(this.val)
     return this
   }
 
   public doOnErrorMatching(p: (t: T) => boolean, f: (t: T) => void): Monad<T> {
-    if (!isPresent(this.val)) return maybe()
-
-    if (this.val instanceof Error && p(this.val)) {
-      f(this.val)
-      return this
-    }
-    return maybe()
+    if (isPresent(this.val) && this.val instanceof Error && p(this.val)) f(this.val)
+    return this
   }
 
   public onErrorMap<U>(f: (t: T) => U): Monad<U> {

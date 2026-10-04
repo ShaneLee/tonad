@@ -181,6 +181,15 @@ describe('maybe', () => {
       maybe('test').doOnError(() => fail())
     })  
 
+    it('retains value when not error', () => {
+      expect(maybe('test').doOnError(() => undefined).getOrUndefined()).toBe('test')
+    })
+
+    it('retains error after calling function', () => {
+      const error = new Error()
+      expect(maybe(error).doOnError(() => undefined).getOrUndefined()).toBe(error)
+    })
+
     it('does not call function when empty', () => {
       maybe().doOnError(() => fail())
     })  
@@ -202,6 +211,29 @@ describe('maybe', () => {
     it('does not call function when not error', () => {
       maybe('test').doOnErrorMatching(err => true, val => fail())
     })  
+
+    it('retains value when not error', () => {
+      expect(maybe('test')
+              .doOnErrorMatching(err => true, val => undefined)
+              .getOrUndefined())
+            .toBe('test')
+    })
+
+    it('retains error when predicate false', () => {
+      const error = new Error()
+      expect(maybe(error)
+              .doOnErrorMatching(err => false, val => undefined)
+              .getOrUndefined())
+            .toBe(error)
+    })
+
+    it('retains error when predicate true', () => {
+      const error = new Error()
+      expect(maybe(error)
+              .doOnErrorMatching(err => true, val => undefined)
+              .getOrUndefined())
+            .toBe(error)
+    })
 
     it('does not call function when empty', () => {
       maybe().doOnErrorMatching(err => true, val => fail())
