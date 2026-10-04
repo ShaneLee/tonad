@@ -13,6 +13,31 @@ describe('maybe', () => {
     })  
   })  
 
+  describe('falsy values', () => {
+    it.each([0, '', false, NaN])('treats %p as a present value', (val) => {
+      expect(maybe(val).hasValue()).toBe(true)
+      expect(maybe(val).isEmpty()).toBe(false)
+      expect(maybe(val).getOrUndefined()).toBe(val)
+    })
+
+    it('maps falsy values', () => {
+      expect(maybe(0).map(val => val + 1).getOrUndefined()).toBe(1)
+    })
+
+    it('filters falsy values', () => {
+      expect(maybe(0).filter(val => val === 0).getOrUndefined()).toBe(0)
+    })
+
+    it('does not switch when value is falsy', () => {
+      expect(maybe('').switchIfEmpty('switched').getOrUndefined()).toBe('')
+    })
+
+    it('treats null as empty', () => {
+      expect(maybe(null).isEmpty()).toBe(true)
+      expect(maybe(null).getOrUndefined()).toBeUndefined()
+    })
+  })
+
   describe('map', () => {
     it('maps values', () => {
       expect(maybe('Hello').map(val => val + '1').getOrUndefined()).toBe('Hello1')
